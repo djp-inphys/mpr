@@ -1,0 +1,39 @@
+# Ignore the .vscode directory (settings specific to VSCode)
+.vscode/
+
+# Ignore Python cache files and directories
+__pycache__/
+*.py[cod]
+
+# Ignore all .env files
+.env
+
+# Ignore csv files
+*.csv
+
+# Ignore pickle files
+*.pkl
+
+# Ignore log files
+*.log
+
+# Ignore all .zip files
+*.zip
+
+# Ignore all .fig files
+*.fig
+
+# ingore all .mat files
+*.mat
+
+# Ignore all .m files
+*.m
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore build directories
+Calibration Suport/
+Matlab/
+Nuvia/
+temp_data/
