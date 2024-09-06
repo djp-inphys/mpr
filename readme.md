@@ -11,7 +11,7 @@
 *   **Automation:** It automates the preprocessing of input data, dimensionality reduction, and selection of optimal classifiers, minimising the need for human intervention.
 *   **Multi-level Learning:** The system incorporates multiple levels of learning, enabling it to adapt and optimise its performance based on the data it processes.
 *   **Wide Applicability:** The approach is applicable to a wide range of problems, as long as the data is represented as a set of real numbers and contains sufficient complexity.
-*   **Improved Classification Efficiency:** The thesis demonstrates that meta-pattern recognition can significantly improve the accuracy of classification, particularly in challenging scenarios like stock market prediction and medical diagnosis.
+*   **Improved Classification Efficiency:** Meta-pattern recognition can significantly improve the accuracy of classification, particularly in challenging scenarios like stock market prediction and medical diagnosis.
 *   **Integration of AI Approaches:** It bridges the gap between rule-based (expert systems) and connectionist (neural networks) AI systems, offering a unified framework for decision-making.
 
 ### Core Concepts
@@ -23,11 +23,9 @@
 
 ### Potential Applications
 
-The thesis highlights the potential of meta-pattern recognition in medical decision-making and wider application domains. It also suggests its relevance for expert systems, where the combinatorial explosion of rules can be mitigated by the optimal subset selection.
+The core ideas explored in MPR, such as dimensionality reduction, feature extraction, and the quest for optimal representations of data, are fundamental to the success of contemporary AI algorithms. The MPR's emphasis on extracting meaningful information from complex data and making informed decisions based on patterns aligns well with the goals of modern AI, which strives to develop intelligent systems capable of understanding and interpreting the world around them.
 
-The core ideas explored in the thesis, such as dimensionality reduction, feature extraction, and the quest for optimal representations of data, are fundamental to the success of contemporary AI algorithms. The thesis's emphasis on extracting meaningful information from complex data and making informed decisions based on patterns aligns well with the goals of modern AI, which strives to develop intelligent systems capable of understanding and interpreting the world around them.
-
-The thesis's exploration of the relationship between data representation and classification, as well as its focus on minimising noise and redundancy in data, resonates with current efforts in AI to develop robust and efficient models that can generalise well to new, unseen data. The concept of "meta-pattern recognition," which involves applying pattern recognition techniques recursively to optimise the pattern recognition process itself, foreshadows the current trend in AI towards developing more adaptable and self-learning systems.
+The MPR's exploration of the relationship between data representation and classification, as well as its focus on minimising noise and redundancy in data, resonates with current efforts in AI to develop robust and efficient models that can generalise well to new, unseen data. The concept of "meta-pattern recognition," which involves applying pattern recognition techniques recursively to optimise the pattern recognition process itself, foreshadows the current trend in AI towards developing more adaptable and self-learning systems.
 
 The pursuit of optimal data representations, efficient feature extraction, and effective classification strategies continues to drive advancements in AI research and applications. 
 
@@ -36,9 +34,9 @@ The pursuit of optimal data representations, efficient feature extraction, and e
 ### Sources and Related Content
 
 *   The concepts of dimensionality reduction and feature extraction are central to modern machine learning techniques such as Principal Component Analysis (PCA), t-SNE, and autoencoders.
-*   The thesis's focus on minimising noise and redundancy in data is echoed in current research on data cleaning, pre-processing, and regularisation techniques.
+*   The MPR's focus on minimising noise and redundancy in data is echoed in current research on data cleaning, pre-processing, and regularisation techniques.
 *   The idea of "meta-pattern recognition" and its hierarchical approach to pattern recognition can be seen as a precursor to modern meta-learning and AutoML techniques, which aim to automate the process of selecting and optimising machine learning models.
-*   The thesis's application of pattern recognition to medical imaging is still an active area of research, with deep learning models now playing a major role in image analysis and diagnosis.
+*   The MPR's application of pattern recognition to medical imaging is still an active area of research, with deep learning models now playing a major role in image analysis and diagnosis.
 ---
 
 ## Table of Contents
@@ -49,7 +47,7 @@ The pursuit of optimal data representations, efficient feature extraction, and e
     - [Potential Applications](#potential-applications)
     - [Sources and Related Content](#sources-and-related-content)
   - [Table of Contents](#table-of-contents)
-  - [Key Concepts from the Thesis](#key-concepts-from-the-thesis)
+  - [Key Concepts of MPR](#key-concepts-of-mpr)
   - [Features](#features)
   - [Dependencies](#dependencies)
   - [Project Structure](#project-structure)
@@ -57,7 +55,7 @@ The pursuit of optimal data representations, efficient feature extraction, and e
   - [Configuration](#configuration)
   - [Contributing](#contributing)
 
-## Key Concepts from the Thesis
+## Key Concepts of MPR
 
 * **Optimal Subset Selection:** The pipeline aims to identify and utilise the most informative subset of features, addressing the "curse of dimensionality" and improving classification performance.
 * **Classification Space:** The outputs of multiple classifiers are combined into a "classification space," enabling a more robust and adaptable classification strategy.
@@ -70,7 +68,7 @@ The pursuit of optimal data representations, efficient feature extraction, and e
 - **Hyperparameter Tuning**: Utilises grid search for hyperparameter optimisation.
 - **Dimensionality Reduction**: PCA is used for feature extraction and reduction.
 - **Parallel Processing**: Leverages multithreading for improved efficiency.
-- **KY Data Analysis**: Performs PCA and computes Kittler-Young (KY) scores, offering 3D visualisations for analysis (potentially related to the thesis concept of "orthogonal truth space").
+- **KY Data Analysis**: Performs PCA and computes Kittler-Young (KY) scores, offering 3D visualisations for analysis (potentially related to the MPR concept of "orthogonal truth space").
 
 ## Dependencies
 
@@ -121,5 +119,5 @@ Contributions are welcome! Please fork the repository and submit pull requests.
 
 * The current code focuses on binary classification.
 * The prediction ("run") mode is not yet fully implemented.
-* The KY data analysis and visualisation functions may be related to the thesis concept of "orthogonal truth space," warranting further exploration.
+* The KY data analysis and visualisation functions may be related to the MPR concept of "orthogonal truth space," warranting further exploration.
 
