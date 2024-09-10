@@ -6,7 +6,7 @@ config = {'datapath': 'D:/Users/david/Documents/PycharmProjects/mpr/dof/',
           'fname_results' : 'results.npy',
           'n_stages' : 5,
           'n_dim': 230,
-          'kittle and young' : False, # feature extraction based on first order
+          'kittle and young' : True, # feature extraction based on first order
           'save' : False,
           'n_components': 10,
           'n_selvar': 5,

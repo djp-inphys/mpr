@@ -1,4 +1,4 @@
-# stanard imports
+# standard imports
 import pandas as pd
 import numpy as np
 import sklearn.linear_model as lm
@@ -97,7 +97,7 @@ def process_training_data():
                 raise ValueError("Class vector does not have the correct shape.")
         
         return trn_descs, clsvec
-    return None, None
+    return trn_descs, clsvec, ky_coeffs
 
 
 def process_test_data(ky_coeffs):
