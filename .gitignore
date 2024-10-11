@@ -33,7 +33,9 @@ __pycache__/
 .ipynb_checkpoints/
 
 # Ignore build directories
-Calibration Suport/
-Matlab/
-Nuvia/
-temp_data/
+beale/
+data/
+gamma/
+neutron/
+old/
+process/

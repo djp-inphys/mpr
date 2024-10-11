@@ -199,12 +199,6 @@ def load_data(file_path, delimiter=",", columns=None):
         print(f"Error loading data from {file_path}: {e}")
         return None
 
-import matplotlib
-# matplotlib.use('TkAgg')
-
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-
 
 def plot_3d(scores, y, title):
     """
@@ -269,8 +263,6 @@ def plot_3d_side_by_side(scores1, y1, title1, scores2, y2, title2):
 
 # Example usage
 def main():
-
-    
     # read in CT lung cancer data
     trn_filename = config["datapath"] + "train.csv"
     trn_descs = load_data(trn_filename) 

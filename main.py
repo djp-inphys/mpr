@@ -1,14 +1,24 @@
-# standard imports
+import warnings
 import pandas as pd
 import numpy as np
 import sklearn.linear_model as lm
 import pickle as pk
 from sklearn.decomposition import PCA
 from sklearn.metrics import roc_auc_score, log_loss
-import matplotlib.pyplot as plt
-# local imports
+from mpl_toolkits.mplot3d import Axes3D
+import logging
 from process import process, classifiers, ky
 from config_submit import config
+
+import matplotlib.pyplot as plt
+import matplotlib
+
+from src.ky import KYAnalyser
+# Suppress unnecessary warnings
+warnings.filterwarnings("ignore", category=FutureWarning)
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 def load_data(file_path, delimiter=",", columns=None):
@@ -19,44 +29,62 @@ def load_data(file_path, delimiter=",", columns=None):
         data = np.genfromtxt(file_path, skip_header=1, delimiter=delimiter)
         if columns:
             data = data[:, columns]
+        logging.info(f"Data loaded successfully from {file_path}.")
         return data
     except Exception as e:
-        print(f"Error loading data from {file_path}: {e}")
-        return None
+        logging.error(f"Error loading data from {file_path}: {e}")
+        raise
 
 
 def save_data(file_path, data):
     """
     Save numpy data to a file.
     """
-    np.save(file_path, data)
+    try:
+        np.save(file_path, data)
+        logging.info(f"Data saved to {file_path}.")
+    except Exception as e:
+        logging.error(f"Error saving data to {file_path}: {e}")
+        raise
 
 
 def perform_pca(descriptors, n_components=None):
     """
     Perform PCA on the dataset and return transformed data.
     """
-    pca = PCA(n_components=n_components)
-    return pca.fit_transform(descriptors), pca
+    try:
+        pca = PCA(n_components=n_components)
+        transformed_data = pca.fit_transform(descriptors)
+        logging.info(f"PCA performed with {n_components} components.")
+        return transformed_data, pca
+    except Exception as e:
+        logging.error(f"Error performing PCA: {e}")
+        raise
 
 
-def plot_3d(features, labels, title):
+def plot_3d(features, labels=None, title="3D Plot"):
     """
     Plot a 3D scatter plot of the first 3 PCA components or classification scores.
+
     """
-    fig = plt.figure(dpi=200)
-    ax = fig.gca(projection='3d')
-    
-    if hasattr(labels, "shape"):
-        bad = features[labels == 1]
-        good = features[labels == 0]
-        ax.scatter(bad[:, 0], bad[:, 1], bad[:, 2], color='r', label='Bad')
-        ax.scatter(good[:, 0], good[:, 1], good[:, 2], color='g', label='Good')
-    else:
-        ax.scatter(features[:, 0], features[:, 1], features[:, 2], color='b')
-    
-    ax.set_title(title)
-    plt.show()
+    matplotlib.use('TkAgg')
+    try:
+        fig = plt.figure(dpi=200)
+        ax = fig.add_subplot(111, projection='3d')
+        
+        if labels is not None and hasattr(labels, "shape"):
+            ax.scatter(features[labels == 1, 0], features[labels == 1, 1], features[labels == 1, 2], c='r', label='Class 1')
+            ax.scatter(features[labels == 0, 0], features[labels == 0, 1], features[labels == 0, 2], c='g', label='Class 0')
+        else:
+            ax.scatter(features[:, 0], features[:, 1], features[:, 2], c='b', label='Data')
+        
+        ax.set_title(title)
+        plt.legend()
+        plt.show()
+        logging.info(f"3D plot created: {title}.")
+    except Exception as e:
+        logging.error(f"Error creating 3D plot: {e}")
+        raise
 
 
 def ky_transformation(descriptors, labels):
@@ -64,108 +92,121 @@ def ky_transformation(descriptors, labels):
     Perform KY transformation on the dataset and plot results.
     """
     try:
-        pca_scores, pca = perform_pca(descriptors)
+        pca_scores, _ = perform_pca(descriptors)
         plot_3d(pca_scores, labels, "PCA Scores")
-        
-        bad, good = pca_scores[labels == 1], pca_scores[labels == 0]
-        combined_data = np.concatenate((bad, good))
-        ky_coeffs, ky_scores = ky(combined_data, labels)
-        
+
+        ky_analyser = KYAnalyser()
+        ky_coeffs, ky_scores   = ky_analyser.fit_transform(descriptors, labels)
+
         plot_3d(ky_scores, labels, "KY Scores")
         return ky_scores, ky_coeffs
     except Exception as e:
-        print(f"Error during KY transformation: {e}")
-        return None, None
+        logging.error(f"Error during KY transformation: {e}")
+        raise
 
 
 def process_training_data():
     """
     Load, process, and return training data descriptors and class labels.
     """
-    trn_filename = config["datapath"] + "train.csv"
-    trn_descs = load_data(trn_filename)
-    
-    if trn_descs is not None:
+    try:
+        trn_filename = f"{config['datapath']}train.csv"
+        trn_descs = load_data(trn_filename)
+
         clsvec = trn_descs[:, 1]
         trn_descs = trn_descs[:, 2:-1]
-        
+
         if config.get("kittler and young"):
             if hasattr(clsvec, "shape"):
                 trn_descs, ky_coeffs = ky_transformation(trn_descs, clsvec)
-                save_data(config["datapath"] + "trn_descs.npy", trn_descs)
+                save_data(f"{config['datapath']}trn_descs.npy", trn_descs)
             else:
                 raise ValueError("Class vector does not have the correct shape.")
-        
-        return trn_descs, clsvec
-    return trn_descs, clsvec, ky_coeffs
+
+        return trn_descs, ky_coeffs, clsvec
+    
+    except Exception as e:
+        logging.error(f"Error processing training data: {e}")
+        raise
 
 
-def process_test_data(ky_coeffs):
+def process_test_data(ky_coeffs=None):
     """
     Load and transform test data descriptors.
     """
-    tst_filename = config["datapath"] + "test.csv"
-    tst_descs = load_data(tst_filename, columns=slice(1, -1))
-    
-    if tst_descs is not None and ky_coeffs is not None:
-        tst_descs = np.matmul(tst_descs, ky_coeffs)
-        save_data(config["datapath"] + "tst_descs.npy", tst_descs)
-    
-    return tst_descs
+    try:
+        tst_filename = f"{config['datapath']}test.csv"
+        tst_descs = load_data(tst_filename, columns=slice(1, -1))
+
+        if tst_descs is not None and ky_coeffs is not None:
+            tst_descs = np.dot(tst_descs, ky_coeffs)
+            save_data(f"{config['datapath']}tst_descs.npy", tst_descs)
+        return tst_descs
+    except Exception as e:
+        logging.error(f"Error processing test data: {e}")
+        raise
 
 
 def run_pipeline(trn_descs, clsvec, tst_descs):
     """
     Run the machine learning pipeline: PCA, classification, and result saving.
     """
-    models, stages = [], []
-    
-    for stage in range(config['n_stages']):
-        pca_features, pca = perform_pca(trn_descs, n_components=config.get("dim"))
-        stages.append(pca)
+    try:
+        models, stages = [], []
 
-        # Plot results
-        plot_3d(pca_features, clsvec, "PCA Scores (Train)")
-        plot_3d(pca.transform(tst_descs), [], "PCA Scores (Test)")
-        
-        # Train model
-        results, mdl = process(pca_features[:, :config["dim"]], clsvec)
-        models.append(mdl)
-        
-        # Save intermediate results
-        np.savetxt(f"res_{stage}.csv", results, delimiter=",", fmt="%10.8f")
+        for stage in range(config['n_stages']):
+            pca_features, pca = perform_pca(trn_descs, n_components=config.get("dim"))
+            stages.append(pca)
 
-        # Assess model performance
-        linreg = lm.LinearRegression()
-        linreg.fit(results, clsvec.reshape(-1, 1))
-        linreg_pred = linreg.predict(results)
-        print(log_loss(linreg_pred, clsvec))
+            # Plot results
+            plot_3d(pca_features, clsvec, f"PCA Scores (Train Stage {stage})")
+            plot_3d(pca.transform(tst_descs), [], f"PCA Scores (Test Stage {stage})")
 
-        trn_descs = results  # Use results as new descriptors for next stage
+            # Train model
+            results, mdl = process(pca_features[:, :config["dim"]], clsvec)
+            models.append(mdl)
 
-    # Save stages and models
-    pk.dump(stages, open("representation.pkl", "wb"))
-    pk.dump(models, open("models.pkl", "wb"))
+            # Save intermediate results
+            np.savetxt(f"res_{stage}.csv", results, delimiter=",", fmt="%10.8f")
+
+            # Assess model performance
+            linreg = lm.LinearRegression()
+            linreg.fit(results, clsvec.reshape(-1, 1))
+            linreg_pred = linreg.predict(results)
+            logging.info(f"Log loss at stage {stage}: {log_loss(clsvec, linreg_pred)}")
+
+            trn_descs = results  # Use results as new descriptors for the next stage
+
+        # Save stages and models
+        pk.dump(stages, open("representation.pkl", "wb"))
+        pk.dump(models, open("models.pkl", "wb"))
+        logging.info("Pipeline run completed and models saved.")
+    except Exception as e:
+        logging.error(f"Error running pipeline: {e}")
+        raise
 
 
 def main():
     try:
-        trn_descs, clsvec = process_training_data()
-        tst_descs = process_test_data(None)
-        
+        trn_descs, ky_coeffs, clsvec = process_training_data()
+        tst_descs = process_test_data(ky_coeffs)
+
         if config["run_type"] == "build":
             run_pipeline(trn_descs, clsvec, tst_descs)
         elif config["run_type"] == "run":
             stages = pk.load(open("representation.pkl", "rb"))
             models = pk.load(open("models.pkl", "rb"))
             descs = tst_descs
+
             for stage, mdl in zip(stages, models):
                 if isinstance(stage, PCA):
                     descs = stage.transform(descs)
                 descs = classifiers(mdl, descs[:, :config["dim"]])
             # Further classification and predictions can go here
+        logging.info("Main execution completed successfully.")
     except Exception as e:
-        print(f"Error in main: {e}")
+        logging.error(f"Error in main: {e}")
+        raise
 
 
 if __name__ == '__main__':
