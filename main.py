@@ -21,15 +21,14 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
-def load_data(file_path, delimiter=",", columns=None):
+def load_data(file_path):
     """
     Load data from a file and return as a numpy array.
     """
     try:
-        data = np.genfromtxt(file_path, skip_header=1, delimiter=delimiter)
-        if columns:
-            data = data[:, columns]
+        data = np.load(file_path)
         logging.info(f"Data loaded successfully from {file_path}.")
+
         return data
     except Exception as e:
         logging.error(f"Error loading data from {file_path}: {e}")
@@ -110,12 +109,11 @@ def process_training_data():
     Load, process, and return training data descriptors and class labels.
     """
     try:
-        trn_filename = f"{config['datapath']}train.csv"
+        trn_filename = f"{config['datapath']}{config['fname_train']}"
         trn_descs = load_data(trn_filename)
 
-        clsvec = trn_descs[:, 1]
-        trn_descs = trn_descs[:, 2:-1]
-
+        clsvec = np.load( config['classes.npy'] )
+    
         if config.get("kittler and young"):
             if hasattr(clsvec, "shape"):
                 trn_descs, ky_coeffs = ky_transformation(trn_descs, clsvec)
