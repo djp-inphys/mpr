@@ -151,8 +151,8 @@ class KYAnalyser:
             mns[:, clsno] = np.mean(sample, axis=0)
         
         # First transformation
-        U, lembda = PCACovAnalyser.analyze(Sw)
-        d = np.diag(np.sqrt(1 / lembda))
+        U, latent = PCACovAnalyser.analyze(Sw)
+        d = np.diag(np.sqrt(1 / latent))
         B = U @ d
         
         # Calculate between-class scatter matrix
@@ -160,13 +160,14 @@ class KYAnalyser:
         
         # Second transformation
         finalTransformMatrix = B.T @ Sb @ B
-        V, _ = PCACovAnalyser.analyze(finalTransformMatrix)
+        V, latent = PCACovAnalyser.analyze(finalTransformMatrix)
         
         # Final transformation matrix
         self.coeffs = B @ V
         self.scores = data @ self.coeffs
+        self.final_lambda = latent
         
-        return self.coeffs, self.scores
+        return self.coeffs, self.scores, self.final_lambda
 
     def transform(self, data):
         """
