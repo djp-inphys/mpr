@@ -21,7 +21,7 @@ from src.process import process_none_parallel, classifiers
 warnings.filterwarnings("ignore", category=FutureWarning)
 
 # Configure logging
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 def load_data(file_path):
