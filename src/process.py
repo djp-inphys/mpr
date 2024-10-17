@@ -14,10 +14,9 @@ import logging
 from typing import Optional, List
 import matplotlib.pyplot as plt
 
-
 def call_beale(descs: np.ndarray, clsvec: np.ndarray, n_selvar: Optional[int] = None) -> List[int]:
     """
-    Call Beale's regression reselection algorithm to select variables.
+    Call Beale's regression reselection algorithm to select variables using BealeAlgorithm class.
 
     Args:
         descs (np.ndarray): Descriptor matrix.
@@ -28,19 +27,17 @@ def call_beale(descs: np.ndarray, clsvec: np.ndarray, n_selvar: Optional[int] = 
         List[int]: Indices of selected variables.
     """
     try:
-        clsarr = clsvec.reshape(-1, 1)
-        combined_space = np.hstack((descs, clsarr))
-        correlation_matrix = np.corrcoef(combined_space, rowvar=False)
-
         if n_selvar is None:
             n_selvar = config['n_selvar']
 
-        selected_variables = beale(correlation_matrix, n_selvar)
-        variable_indices = np.arange(descs.shape[1])
-        return variable_indices[selected_variables == 1].tolist()
+        beale_algo = BealeAlgorithm(descs, clsvec)
+        selected_variables = beale_algo.beale(n_selvar)
+        
+        return selected_variables
     except Exception as e:
         logging.error(f"Error in call_beale: {str(e)}")
         raise
+
 
 def train_models(models, dataset, labels):
     """
@@ -54,7 +51,7 @@ def train_models(models, dataset, labels):
             trained_models.append(trained_model)
             logging.debug(f"Model {i+1} training completed")
         
-        logging.info(f"All {len(models)} models have been trained")
+        logging.debug(f"All {len(models)} models have been trained")
         return trained_models
     except Exception as e:
         print(e)
@@ -68,7 +65,7 @@ def classify(models, instance):
         probabilities = []
         instance_array = np.array(instance).reshape(1, -1)  # Reshape to 2D array
         for i, model in enumerate(models):
-            prob = model.predict_proba(instance_array)[0]  # Get probability for class 0
+            prob = model.predict_proba(instance_array)[0][1]  # Get probability for class 1 - this approximate the combined probability of the two classes
             probabilities.append(prob)
             logging.debug(f"Model {i}: Probability for class 0 = {prob}")
         return probabilities
@@ -151,7 +148,7 @@ def process_none_parallel(dataset, labels):
         
         
         # Perform leave-one-out cross-validation
-        logging.info("Dataset visualization saved as 'dataset_visualization.png'")
+        # logging.info("Dataset visualization saved as 'dataset_visualization.png'")
         for unk_idx in range(num_unknowns):
             leave_one_out(unk_idx, models, dataset, labels, results)
         
